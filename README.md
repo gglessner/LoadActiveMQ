@@ -59,10 +59,7 @@ packaging>=21.0
 ## Usage
 
 1. **Launch the Module**:
-   - Run the `LoadActiveMQ` module, either as part of the HACKtiveMQ Suite or standalone:
-     ```bash
-     python load_activemq.py
-     ```
+   - Run the `LoadActiveMQ` module via the ningu framework or the HACKtiveMQ Suite.
 
 2. **Select and Run ActiveMQ**:
    - The `ActiveMQ Versions` list displays available versions based on `.zip` files in `modules/Load_ActiveMQ`.
