@@ -81,6 +81,7 @@ packaging>=21.0
    - The module ensures resources are released when closed, terminating any running ActiveMQ processes.
 
 ## Directory Structure
+```
 HACKtiveMQ_Suite/
 ├── modules/
 │   ├── Load_ActiveMQ/              # Place ActiveMQ .zip files here
@@ -88,6 +89,7 @@ HACKtiveMQ_Suite/
 │   │   ├── apache-activemq-5.10.0-bin.zip
 │   │   └── ...
 └── 2_LoadActiveMQ.py               # LoadActiveMQ module
+```
 
 ## Limitations
 - **Windows-Only**: The module uses Windows-specific commands (`activemq.bat`, `taskkill`) and paths, making it incompatible with Linux or macOS without modifications.
