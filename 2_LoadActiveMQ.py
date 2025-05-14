@@ -27,7 +27,7 @@ import time
 from packaging import version  # Added for version comparison
 
 # Define the version number
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 # Define the tab label
 TAB_LABEL = f"LoadActiveMQ v{VERSION}"
@@ -95,7 +95,7 @@ class Ui_TabContent:
 
         self.StatusTextBox = QPlainTextEdit(self.frame_4)
         self.StatusTextBox.setReadOnly(True)
-        status_font = QFont("Courier New", 10)
+        status_font = QFont("Courier New", 16)
         status_font.setFixedPitch(True)
         self.StatusTextBox.setFont(status_font)
         self.verticalLayout.addWidget(self.StatusTextBox)
