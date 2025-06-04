@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from PySide6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QFileDialog, QSpacerItem, QSizePolicy, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import QWidget, QPlainTextEdit, QVBoxLayout, QHBoxLayout, QLabel, QFrame, QFileDialog, QSpacerItem, QSizePolicy, QListWidget, QListWidgetItem, QPushButton
 from PySide6.QtGui import QFont, QTextCursor
 from PySide6.QtCore import Qt
 import os
@@ -27,7 +27,7 @@ import time
 from packaging import version  # Added for version comparison
 
 # Define the version number
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 # Define the tab label
 TAB_LABEL = f"LoadActiveMQ v{VERSION}"
@@ -84,6 +84,22 @@ class Ui_TabContent:
 
         self.ActiveMQList = QListWidget(self.frame_3)
         self.verticalLayout_client.addWidget(self.ActiveMQList)
+
+        # Control buttons layout
+        self.horizontalLayout_buttons = QHBoxLayout()
+        
+        # Add Stop button
+        self.stopButton = QPushButton("Stop ActiveMQ")
+        self.stopButton.setEnabled(False)
+        self.horizontalLayout_buttons.addWidget(self.stopButton)
+        
+        # Add Restart button
+        self.restartButton = QPushButton("Restart ActiveMQ")
+        self.restartButton.setEnabled(False)
+        self.horizontalLayout_buttons.addWidget(self.restartButton)
+        
+        # Add buttons layout to main layout
+        self.verticalLayout_client.addLayout(self.horizontalLayout_buttons)
 
         self.verticalLayout_3.addWidget(self.frame_3)
 
@@ -154,6 +170,8 @@ class TabContent(QWidget):
 
         # Connect signals
         self.ui.ActiveMQList.itemClicked.connect(self.handle_version_selection)
+        self.ui.stopButton.clicked.connect(self.stop_current_activemq)
+        self.ui.restartButton.clicked.connect(self.restart_current_activemq)
 
         # Initialize ActiveMQ versions list
         self.update_version_list()
@@ -341,6 +359,41 @@ class TabContent(QWidget):
         self.delete_temp_dir_with_retries()
 
         self.current_version = None
+        
+        # Disable control buttons if no version is running
+        self.ui.stopButton.setEnabled(False)
+        self.ui.restartButton.setEnabled(False)
+
+    def restart_current_activemq(self):
+        """Restart the currently running ActiveMQ instance."""
+        if self.current_version:
+            version_name = self.current_version
+            self.log_to_status(f"Restarting ActiveMQ version: {version_name}")
+            
+            # Find the zip file for the current version
+            zip_filename = None
+            for i in range(self.ui.ActiveMQList.count()):
+                item = self.ui.ActiveMQList.item(i)
+                if item.text() == version_name:
+                    zip_filename = item.data(Qt.UserRole)
+                    break
+            
+            if zip_filename:
+                zip_path = os.path.join("modules", "Load_ActiveMQ", zip_filename)
+                # Stop the current instance
+                self.stop_current_activemq()
+                # Start it again
+                self.current_version = version_name
+                self.run_activemq(version_name, zip_path)
+                # Enable control buttons
+                self.ui.stopButton.setEnabled(True)
+                self.ui.restartButton.setEnabled(True)
+            else:
+                self.log_to_status(f"Error: Could not find zip file for {version_name}")
+        else:
+            self.log_to_status("No ActiveMQ version is currently running")
+            self.ui.stopButton.setEnabled(False)
+            self.ui.restartButton.setEnabled(False)
 
     def handle_version_selection(self, item):
         """Handle selection of an ActiveMQ version."""
@@ -362,6 +415,10 @@ class TabContent(QWidget):
         # Run the selected version
         self.current_version = version_name
         self.run_activemq(version_name, zip_path)
+        
+        # Enable control buttons
+        self.ui.stopButton.setEnabled(True)
+        self.ui.restartButton.setEnabled(True)
 
     def cleanup(self):
         """Clean up resources before closing."""
